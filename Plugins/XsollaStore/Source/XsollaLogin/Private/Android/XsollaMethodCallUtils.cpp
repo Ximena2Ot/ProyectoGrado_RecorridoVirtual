@@ -1,0 +1,26 @@
+// Copyright 2024 Xsolla Inc. All Rights Reserved.
+
+#include "XsollaMethodCallUtils.h"
+
+namespace XsollaMethodCallUtils
+{
+#if PLATFORM_ANDROID
+	void CallStaticVoidMethod(const ANSICHAR* ClassName, const ANSICHAR* MethodName, const ANSICHAR* MethodSignature, ...)
+	{
+		bool bIsOptional = false;
+
+		JNIEnv* Env = FAndroidApplication::GetJavaEnv();
+
+		jclass Class = FAndroidApplication::FindJavaClass(ClassName);
+
+		jmethodID Method = FJavaWrapper::FindStaticMethod(Env, Class, MethodName, MethodSignature, bIsOptional);
+
+		va_list Args;
+		va_start(Args, MethodSignature);
+		Env->CallStaticVoidMethodV(Class, Method, Args);
+		va_end(Args);
+
+		Env->DeleteLocalRef(Class);
+	}
+#endif
+}
